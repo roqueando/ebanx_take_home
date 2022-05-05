@@ -2,6 +2,7 @@ defmodule EbanxTakeHomeWeb.BalanceControllerTest do
   use EbanxTakeHomeWeb.ConnCase
 
   setup %{conn: conn} do
+    EbanxTakeHome.Accounts.reset()
     EbanxTakeHome.Accounts.add_account(%{id: 100, amount: 150})
     %{conn: conn, account_id: 100}
   end

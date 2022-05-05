@@ -11,8 +11,7 @@ defmodule EbanxTakeHome.Accounts do
   def handle_call(:get_accounts, _from, state), do: {:reply, state, state}
 
   def handle_call({:get_account_by_id, value}, _from, state) do
-    index = Enum.find_index(state, fn account -> account.id == value end)
-    account = get_by_index(state, index)
+    account = get_account(state, value)
 
     case account do
       nil ->
@@ -33,10 +32,34 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [account | state]}
   end
 
+  def handle_cast({:deposit_in_account, id, amount}, state)
+      when is_binary(id) and is_binary(amount) do
+    id = String.to_integer(id)
+    amount = String.to_integer(amount)
+
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount + amount)
+
+    {:noreply, [account | state]}
+  end
+
+  def handle_cast({:deposit_in_account, id, amount}, state) do
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount + amount)
+
+    {:noreply, [account | state]}
+  end
+
   @doc """
   Add an account to GenServer's account state
   """
   def add_account(account), do: GenServer.cast(__MODULE__, {:add_account, account})
+
+  @doc """
+  Add an account to GenServer's account state
+  """
+  def deposit_in_account(id, amount),
+    do: GenServer.cast(__MODULE__, {:deposit_in_account, id, amount})
 
   @doc """
   Get all accounts registered on state
@@ -56,4 +79,9 @@ defmodule EbanxTakeHome.Accounts do
 
   defp get_by_index(_accounts, nil), do: nil
   defp get_by_index(accounts, index), do: Enum.at(accounts, index)
+
+  defp get_account(accounts, id) do
+    index = Enum.find_index(accounts, fn account -> account.id == id end)
+    get_by_index(accounts, index)
+  end
 end
