@@ -24,6 +24,11 @@ defmodule EbanxTakeHome.Accounts do
     end
   end
 
+  def handle_cast({:add_account, %{id: id, amount: amount}}, state)
+      when is_binary(id) and is_binary(amount) do
+    {:noreply, [%{id: String.to_integer(id), amount: String.to_integer(amount)} | state]}
+  end
+
   def handle_cast({:add_account, account}, state) do
     {:noreply, [account | state]}
   end
@@ -42,7 +47,12 @@ defmodule EbanxTakeHome.Accounts do
   Reset accounts state
   """
   def reset, do: GenServer.call(__MODULE__, :reset)
-  def get_account_by_id(id), do: GenServer.call(__MODULE__, {:get_account_by_id, id})
+
+  def get_account_by_id(id) when is_binary(id),
+    do: GenServer.call(__MODULE__, {:get_account_by_id, String.to_integer(id)})
+
+  def get_account_by_id(id),
+    do: GenServer.call(__MODULE__, {:get_account_by_id, id})
 
   defp get_by_index(_accounts, nil), do: nil
   defp get_by_index(accounts, index), do: Enum.at(accounts, index)

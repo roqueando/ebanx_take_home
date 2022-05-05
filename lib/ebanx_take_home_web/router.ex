@@ -9,6 +9,7 @@ defmodule EbanxTakeHomeWeb.Router do
     pipe_through :api
 
     resources "/balance", BalanceController, only: [:index]
+    resources "/event", EventController, only: [:create]
     post "/reset", ResetController, :reset, as: :reset
   end
 end
