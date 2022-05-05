@@ -5,9 +5,10 @@ defmodule EbanxTakeHomeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", EbanxTakeHomeWeb do
+  scope "/", EbanxTakeHomeWeb do
     pipe_through :api
 
     resources "/balance", BalanceController, only: [:index]
+    post "/reset", ResetController, :reset, as: :reset
   end
 end

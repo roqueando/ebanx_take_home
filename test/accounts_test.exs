@@ -29,7 +29,6 @@ defmodule EbanxTakeHome.AccountTest do
 
   test "test find account by id", %{account_id: id} do
     account = EbanxTakeHome.Accounts.get_account_by_id(id)
-    IO.inspect(account)
     assert account.id == account.id
   end
 
