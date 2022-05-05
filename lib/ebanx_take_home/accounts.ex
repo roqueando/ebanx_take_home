@@ -32,6 +32,24 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [account | state]}
   end
 
+  def handle_cast({:withdraw_in_account, id, amount}, state)
+      when is_binary(id) and is_binary(amount) do
+    id = String.to_integer(id)
+    amount = String.to_integer(amount)
+
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount - amount)
+
+    {:noreply, [account | state]}
+  end
+
+  def handle_cast({:withdraw_in_account, id, amount}, state) do
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount - amount)
+
+    {:noreply, [account | state]}
+  end
+
   def handle_cast({:deposit_in_account, id, amount}, state)
       when is_binary(id) and is_binary(amount) do
     id = String.to_integer(id)
@@ -50,16 +68,13 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [account | state]}
   end
 
-  @doc """
-  Add an account to GenServer's account state
-  """
   def add_account(account), do: GenServer.cast(__MODULE__, {:add_account, account})
 
-  @doc """
-  Add an account to GenServer's account state
-  """
   def deposit_in_account(id, amount),
     do: GenServer.cast(__MODULE__, {:deposit_in_account, id, amount})
+
+  def withdraw_in_account(id, amount),
+    do: GenServer.cast(__MODULE__, {:withdraw_in_account, id, amount})
 
   @doc """
   Get all accounts registered on state

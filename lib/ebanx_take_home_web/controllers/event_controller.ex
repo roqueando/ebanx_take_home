@@ -25,6 +25,25 @@ defmodule EbanxTakeHomeWeb.EventController do
     end
   end
 
+  def create(conn, %{"type" => "withdraw", "origin" => origin, "amount" => amount}) do
+    account = EbanxTakeHome.Accounts.get_account_by_id(origin)
+
+    case account do
+      {:error, _} ->
+        conn
+        |> resp(404, "0")
+
+      _ ->
+        account = EbanxTakeHome.Event.withdraw(origin, amount)
+
+        handle_response(
+          conn,
+          %{origin: %{id: account.id, balance: account.amount}},
+          :success
+        )
+    end
+  end
+
   defp handle_response(conn, data, :success) do
     conn
     |> put_status(201)
