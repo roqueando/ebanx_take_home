@@ -10,7 +10,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: normalize_id(account.id), balance: account.amount}},
+          %{destination: %{id: account.id, balance: account.amount}},
           :success
         )
 
@@ -19,7 +19,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: normalize_id(account.id), balance: account.amount}},
+          %{destination: %{id: account.id, balance: account.amount}},
           :success
         )
     end
@@ -38,7 +38,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{origin: %{id: normalize_id(account.id), balance: account.amount}},
+          %{origin: %{id: account.id, balance: account.amount}},
           :success
         )
     end
@@ -72,8 +72,8 @@ defmodule EbanxTakeHomeWeb.EventController do
         handle_response(
           conn,
           %{
-            origin: %{id: normalize_id(origin.id), balance: origin.amount},
-            destination: %{id: normalize_id(destination.id), balance: destination.amount}
+            origin: %{id: origin.id, balance: origin.amount},
+            destination: %{id: destination.id, balance: destination.amount}
           },
           :success
         )

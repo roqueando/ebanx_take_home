@@ -94,7 +94,7 @@ defmodule EbanxTakeHomeWeb.EventControllerTest do
 
     result = json_response(conn, 201)["destination"]
     assert result["balance"] == 10
-    assert result["id"] == 100
+    assert result["id"] == "100"
   end
 
   test "POST /event deposit in a existent account", %{conn: conn} do
