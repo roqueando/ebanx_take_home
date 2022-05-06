@@ -28,11 +28,11 @@ defmodule EbanxTakeHomeWeb.EventControllerTest do
     origin = json_response(conn, 201)["origin"]
     destination = json_response(conn, 201)["destination"]
 
-    assert origin["balance"] == "0"
-    assert origin["id"] == 500
+    assert origin["balance"] == 0
+    assert origin["id"] == "500"
 
-    assert destination["balance"] == "15"
-    assert destination["id"] == 600
+    assert destination["balance"] == 15
+    assert destination["id"] == "600"
   end
 
   test "POST /event Transfer from non existing account", %{conn: conn} do
@@ -79,8 +79,8 @@ defmodule EbanxTakeHomeWeb.EventControllerTest do
 
     conn = post(conn, Routes.event_path(conn, :create, params))
     result = json_response(conn, 201)["origin"]
-    assert result["balance"] == "15"
-    assert result["id"] == 400
+    assert result["balance"] == 15
+    assert result["id"] == "400"
   end
 
   test "POST /event Create account with initial balance", %{conn: conn} do
@@ -112,7 +112,7 @@ defmodule EbanxTakeHomeWeb.EventControllerTest do
     conn = post(conn, Routes.event_path(conn, :create, params))
 
     result = json_response(conn, 201)["destination"]
-    assert result["balance"] == "20"
-    assert result["id"] == 200
+    assert result["balance"] == 20
+    assert result["id"] == "200"
   end
 end

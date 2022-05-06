@@ -18,7 +18,6 @@ defmodule EbanxTakeHome.Accounts do
         {:reply, {:error, 0}, state}
 
       _ ->
-        account = Map.put(account, :amount, Integer.to_string(account.amount))
         {:reply, account, state}
     end
   end

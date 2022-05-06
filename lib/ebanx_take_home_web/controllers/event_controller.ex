@@ -10,7 +10,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: account.id, balance: account.amount}},
+          mount_response(account, :destination),
           :success
         )
 
@@ -19,7 +19,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: account.id, balance: account.amount}},
+          mount_response(account, :destination),
           :success
         )
     end
@@ -38,7 +38,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{origin: %{id: account.id, balance: account.amount}},
+          mount_response(account, :origin),
           :success
         )
     end
@@ -71,10 +71,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{
-            origin: %{id: origin.id, balance: origin.amount},
-            destination: %{id: destination.id, balance: destination.amount}
-          },
+          mount_response(origin, destination, :both),
           :success
         )
     end
@@ -86,6 +83,38 @@ defmodule EbanxTakeHomeWeb.EventController do
     |> json(data)
   end
 
-  defp normalize_id(id) when is_binary(id), do: Integer.to_string(id)
-  defp normalize_id(id), do: id
+  def mount_response(%{id: id, amount: amount}, :destination) do
+    %{
+      destination: %{
+        id: Integer.to_string(id),
+        balance: amount
+      }
+    }
+  end
+
+  def mount_response(%{id: id, amount: amount}, :origin) do
+    %{
+      origin: %{
+        id: Integer.to_string(id),
+        balance: amount
+      }
+    }
+  end
+
+  def mount_response(
+        %{id: origin_id, amount: origin_amount},
+        %{id: destination_id, amount: destination_amount},
+        :both
+      ) do
+    %{
+      origin: %{
+        id: Integer.to_string(origin_id),
+        balance: origin_amount
+      },
+      destination: %{
+        id: Integer.to_string(destination_id),
+        balance: destination_amount
+      }
+    }
+  end
 end
