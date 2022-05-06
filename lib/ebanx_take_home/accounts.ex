@@ -28,6 +28,10 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [%{id: String.to_integer(id), amount: String.to_integer(amount)} | state]}
   end
 
+  def handle_cast({:add_account, %{id: id, amount: amount}}, state) when is_binary(id) do
+    {:noreply, [%{id: String.to_integer(id), amount: amount} | state]}
+  end
+
   def handle_cast({:add_account, account}, state) do
     {:noreply, [account | state]}
   end
@@ -36,6 +40,16 @@ defmodule EbanxTakeHome.Accounts do
       when is_binary(id) and is_binary(amount) do
     id = String.to_integer(id)
     amount = String.to_integer(amount)
+
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount - amount)
+
+    {:noreply, [account | state]}
+  end
+
+  def handle_cast({:withdraw_in_account, id, amount}, state)
+      when is_binary(id) do
+    id = String.to_integer(id)
 
     account = get_account(state, id)
     account = Map.put(account, :amount, account.amount - amount)
@@ -61,6 +75,16 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [account | state]}
   end
 
+  def handle_cast({:deposit_in_account, id, amount}, state)
+      when is_binary(id) do
+    id = String.to_integer(id)
+
+    account = get_account(state, id)
+    account = Map.put(account, :amount, account.amount + amount)
+
+    {:noreply, [account | state]}
+  end
+
   def handle_cast({:deposit_in_account, id, amount}, state) do
     account = get_account(state, id)
     account = Map.put(account, :amount, account.amount + amount)
@@ -73,6 +97,19 @@ defmodule EbanxTakeHome.Accounts do
     origin = get_account(state, String.to_integer(origin))
     destination = get_account(state, String.to_integer(destination))
     amount = String.to_integer(amount)
+
+    origin_updated = Map.put(origin, :amount, origin.amount - amount)
+    destination_updated = Map.put(destination, :amount, destination.amount + amount)
+
+    state = update_accounts(state, origin, origin_updated, destination, destination_updated)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:transfer, origin, destination, amount}, state)
+      when is_binary(origin) and is_binary(destination) do
+    origin = get_account(state, String.to_integer(origin))
+    destination = get_account(state, String.to_integer(destination))
 
     origin_updated = Map.put(origin, :amount, origin.amount - amount)
     destination_updated = Map.put(destination, :amount, destination.amount + amount)

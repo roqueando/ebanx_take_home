@@ -51,13 +51,24 @@ defmodule EbanxTakeHomeWeb.EventController do
         "amount" => amount
       }) do
     origin_account = EbanxTakeHome.Accounts.get_account_by_id(origin)
+    destination_account = EbanxTakeHome.Accounts.get_account_by_id(destination)
 
-    case origin_account do
-      {:error, _} ->
+    IO.inspect({origin_account, destination_account})
+
+    case {origin_account, destination_account} do
+      {{:error, _}, {:error, _}} ->
         conn
         |> resp(404, "0")
 
-      _ ->
+      {_, {:error, _}} ->
+        conn
+        |> resp(404, "0")
+
+      {{:error, _}, _} ->
+        conn
+        |> resp(404, "0")
+
+      {_, _} ->
         {origin, destination} = EbanxTakeHome.Event.transfer(origin, destination, amount)
 
         handle_response(
