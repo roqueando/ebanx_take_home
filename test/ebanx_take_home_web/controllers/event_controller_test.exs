@@ -6,6 +6,53 @@ defmodule EbanxTakeHomeWeb.EventControllerTest do
     %{conn: conn}
   end
 
+  test "POST /event Transfer from existing account", %{conn: conn} do
+    EbanxTakeHome.Accounts.add_account(%{
+      id: 500,
+      amount: 15
+    })
+
+    EbanxTakeHome.Accounts.add_account(%{
+      id: 600,
+      amount: 0
+    })
+
+    params = %{
+      "type" => "transfer",
+      "origin" => "500",
+      "destination" => "600",
+      "amount" => 15
+    }
+
+    conn = post(conn, Routes.event_path(conn, :create, params))
+    origin = json_response(conn, 201)["origin"]
+    destination = json_response(conn, 201)["destination"]
+
+    assert origin["balance"] == "0"
+    assert origin["id"] == 500
+
+    assert destination["balance"] == "15"
+    assert destination["id"] == 600
+  end
+
+  test "POST /event Transfer from non existing account", %{conn: conn} do
+    EbanxTakeHome.Accounts.add_account(%{
+      id: 300,
+      amount: 0
+    })
+
+    params = %{
+      "type" => "transfer",
+      "origin" => "200",
+      "destination" => "300",
+      "amount" => 15
+    }
+
+    conn = post(conn, Routes.event_path(conn, :create, params))
+
+    assert response(conn, 404) == "0"
+  end
+
   test "POST /event Withdraw from non existing account", %{conn: conn} do
     params = %{
       "type" => "withdraw",

@@ -44,6 +44,33 @@ defmodule EbanxTakeHomeWeb.EventController do
     end
   end
 
+  def create(conn, %{
+        "type" => "transfer",
+        "origin" => origin,
+        "destination" => destination,
+        "amount" => amount
+      }) do
+    origin_account = EbanxTakeHome.Accounts.get_account_by_id(origin)
+
+    case origin_account do
+      {:error, _} ->
+        conn
+        |> resp(404, "0")
+
+      _ ->
+        {origin, destination} = EbanxTakeHome.Event.transfer(origin, destination, amount)
+
+        handle_response(
+          conn,
+          %{
+            origin: %{id: origin.id, balance: origin.amount},
+            destination: %{id: destination.id, balance: destination.amount}
+          },
+          :success
+        )
+    end
+  end
+
   defp handle_response(conn, data, :success) do
     conn
     |> put_status(201)

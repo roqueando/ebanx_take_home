@@ -68,6 +68,31 @@ defmodule EbanxTakeHome.Accounts do
     {:noreply, [account | state]}
   end
 
+  def handle_cast({:transfer, origin, destination, amount}, state)
+      when is_binary(origin) and is_binary(destination) and is_binary(amount) do
+    origin = get_account(state, String.to_integer(origin))
+    destination = get_account(state, String.to_integer(destination))
+    amount = String.to_integer(amount)
+
+    origin_updated = Map.put(origin, :amount, origin.amount - amount)
+    destination_updated = Map.put(destination, :amount, destination.amount + amount)
+
+    state = update_accounts(state, origin, origin_updated, destination, destination_updated)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:transfer, origin, destination, amount}, state) do
+    origin = get_account(state, origin)
+    destination = get_account(state, destination)
+
+    origin_updated = Map.put(origin, :amount, origin.amount - amount)
+    destination_updated = Map.put(destination, :amount, destination.amount + amount)
+
+    state = update_accounts(state, origin, origin_updated, destination, destination_updated)
+    {:noreply, state}
+  end
+
   def add_account(account), do: GenServer.cast(__MODULE__, {:add_account, account})
 
   def deposit_in_account(id, amount),
@@ -76,14 +101,10 @@ defmodule EbanxTakeHome.Accounts do
   def withdraw_in_account(id, amount),
     do: GenServer.cast(__MODULE__, {:withdraw_in_account, id, amount})
 
-  @doc """
-  Get all accounts registered on state
-  """
-  def get_accounts, do: GenServer.call(__MODULE__, :get_accounts)
+  def transfer(origin, destination, amount),
+    do: GenServer.cast(__MODULE__, {:transfer, origin, destination, amount})
 
-  @doc """
-  Reset accounts state
-  """
+  def get_accounts, do: GenServer.call(__MODULE__, :get_accounts)
   def reset, do: GenServer.call(__MODULE__, :reset)
 
   def get_account_by_id(id) when is_binary(id),
@@ -98,5 +119,21 @@ defmodule EbanxTakeHome.Accounts do
   defp get_account(accounts, id) do
     index = Enum.find_index(accounts, fn account -> account.id == id end)
     get_by_index(accounts, index)
+  end
+
+  defp update_accounts(state, origin, new_origin, destination, new_destination) do
+    state
+    |> Enum.map(fn account ->
+      cond do
+        account.id == new_origin.id ->
+          Map.merge(origin, new_origin)
+
+        account.id == new_destination.id ->
+          Map.merge(destination, new_destination)
+
+        true ->
+          account
+      end
+    end)
   end
 end
