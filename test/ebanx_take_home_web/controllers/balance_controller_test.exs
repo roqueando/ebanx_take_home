@@ -15,6 +15,6 @@ defmodule EbanxTakeHomeWeb.BalanceControllerTest do
 
   test "GET /balance?account_id=100 existing account", %{conn: conn} do
     conn = get(conn, Routes.balance_path(conn, :index), account_id: 100)
-    assert response(conn, 201) == "150"
+    assert response(conn, 200) == "150"
   end
 end

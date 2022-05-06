@@ -13,7 +13,7 @@ defmodule EbanxTakeHomeWeb.BalanceController do
 
       _ ->
         conn
-        |> resp(201, Integer.to_string(account.amount))
+        |> resp(200, Integer.to_string(account.amount))
     end
   end
 end

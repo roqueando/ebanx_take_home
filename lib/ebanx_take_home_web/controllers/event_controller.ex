@@ -59,8 +59,16 @@ defmodule EbanxTakeHomeWeb.EventController do
         |> resp(404, "0")
 
       {_, {:error, _}} ->
-        conn
-        |> resp(404, "0")
+        created_destination_account = EbanxTakeHome.Event.create(destination, amount)
+
+        {origin, created_destination_account} =
+          EbanxTakeHome.Event.transfer(origin, created_destination_account, amount)
+
+        handle_response(
+          conn,
+          mount_response(origin, created_destination_account, :both),
+          :success
+        )
 
       {{:error, _}, _} ->
         conn
