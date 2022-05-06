@@ -6,9 +6,6 @@ defmodule EbanxTakeHome.Events.Create do
     })
 
     EbanxTakeHome.Accounts.get_account_by_id(id)
-    |> IO.inspect()
-
-    EbanxTakeHome.Accounts.get_account_by_id(id)
     |> normalize_amount()
   end
 

@@ -10,7 +10,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: account.id, balance: account.amount}},
+          %{destination: %{id: normalize_id(account.id), balance: account.amount}},
           :success
         )
 
@@ -19,7 +19,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{destination: %{id: account.id, balance: account.amount}},
+          %{destination: %{id: normalize_id(account.id), balance: account.amount}},
           :success
         )
     end
@@ -38,7 +38,7 @@ defmodule EbanxTakeHomeWeb.EventController do
 
         handle_response(
           conn,
-          %{origin: %{id: account.id, balance: account.amount}},
+          %{origin: %{id: normalize_id(account.id), balance: account.amount}},
           :success
         )
     end
@@ -52,8 +52,6 @@ defmodule EbanxTakeHomeWeb.EventController do
       }) do
     origin_account = EbanxTakeHome.Accounts.get_account_by_id(origin)
     destination_account = EbanxTakeHome.Accounts.get_account_by_id(destination)
-
-    IO.inspect({origin_account, destination_account})
 
     case {origin_account, destination_account} do
       {{:error, _}, {:error, _}} ->
@@ -74,8 +72,8 @@ defmodule EbanxTakeHomeWeb.EventController do
         handle_response(
           conn,
           %{
-            origin: %{id: origin.id, balance: origin.amount},
-            destination: %{id: destination.id, balance: destination.amount}
+            origin: %{id: normalize_id(origin.id), balance: origin.amount},
+            destination: %{id: normalize_id(destination.id), balance: destination.amount}
           },
           :success
         )
@@ -87,4 +85,7 @@ defmodule EbanxTakeHomeWeb.EventController do
     |> put_status(201)
     |> json(data)
   end
+
+  defp normalize_id(id) when is_binary(id), do: Integer.to_string(id)
+  defp normalize_id(id), do: id
 end
