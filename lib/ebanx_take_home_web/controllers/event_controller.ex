@@ -62,7 +62,7 @@ defmodule EbanxTakeHomeWeb.EventController do
         created_destination_account = EbanxTakeHome.Event.create(destination, amount)
 
         {origin, created_destination_account} =
-          EbanxTakeHome.Event.transfer(origin, created_destination_account, amount)
+          EbanxTakeHome.Event.transfer(origin_account.id, created_destination_account.id, amount)
 
         handle_response(
           conn,
